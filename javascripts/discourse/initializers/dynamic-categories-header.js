@@ -47,7 +47,7 @@ export default {
       headerElement.innerHTML = headerHtml;
       headerElement.className = "dynamic-categories-header";
       
-      targetElement.insertAdjacentElement("afterend", headerElement);
+      targetElement.insertAdjacentElement("beforebegin", headerElement);
       
       this.attachClickListeners(headerElement);
       
@@ -57,16 +57,17 @@ export default {
   },
   
   findInsertionPoint() {
+    const adBanner = document.querySelector(".google-adsense, .advertisement, [class*='ad-'], [id*='ad-']");
+    if (adBanner) {
+      return adBanner;
+    }
+    
     const searchHeader = document.querySelector("#search-button") || 
                         document.querySelector(".search-header") ||
                         document.querySelector("#main-outlet-wrapper > .container > .row");
     
-    const adBanner = document.querySelector(".google-adsense, .advertisement, [class*='ad-'], [id*='ad-']");
-    if (adBanner) {
-      return adBanner.previousElementSibling || adBanner.parentElement;
-    }
-    
-    return document.querySelector("#main-outlet-wrapper .container") || 
+    return searchHeader ||
+           document.querySelector("#main-outlet-wrapper .container") || 
            document.querySelector("#main-outlet") ||
            document.querySelector(".container.view-categories");
   },
@@ -103,7 +104,7 @@ export default {
         <div class="categories-header-title">
           <h3>${customTitle}</h3>
         </div>
-        <div class="categories-grid" style="display: grid; grid-template-columns: repeat(${categoriesPerRow}, 1fr); gap: 15px; margin: 20px 0;">
+        <div class="categories-grid">
     `;
     
     categories.forEach(category => {
@@ -115,45 +116,11 @@ export default {
         : "";
       
       html += `
-        <div class="category-card" data-category-id="${category.id}" style="
-          background: linear-gradient(135deg, ${categoryColor}, ${this.lightenColor(categoryColor, 20)});
-          border-radius: 8px;
-          padding: 15px;
-          cursor: pointer;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-          min-height: 120px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-        ">
-          <div class="category-header">
-            <div class="category-name" style="
-              color: ${textColor};
-              font-weight: bold;
-              font-size: 16px;
-              margin-bottom: 8px;
-            ">${category.name}</div>
-            ${description ? `
-              <div class="category-description" style="
-                color: ${this.adjustOpacity(textColor, 0.9)};
-                font-size: 13px;
-                line-height: 1.4;
-                margin-bottom: 10px;
-              ">${description}</div>
-            ` : ""}
-          </div>
-          ${showTopicCount ? `
-            <div class="category-stats" style="
-              color: ${this.adjustOpacity(textColor, 0.8)};
-              font-size: 12px;
-              display: flex;
-              align-items: center;
-              gap: 5px;
-            ">
-              <i class="fa fa-comments" style="opacity: 0.7;"></i>
-              ${topicCount} 個討論
-            </div>
-          ` : ""}
+        <div class="category-item" data-category-id="${category.id}">
+          <a href="/c/${category.slug}/${category.id}" class="category-link">
+            <span class="category-name">${category.name}</span>
+            ${showTopicCount ? `<span class="category-count">(${topicCount})</span>` : ""}
+          </a>
         </div>
       `;
     });
@@ -167,28 +134,7 @@ export default {
   },
   
   attachClickListeners(headerElement) {
-    const categoryCards = headerElement.querySelectorAll(".category-card");
-    categoryCards.forEach(card => {
-      card.addEventListener("click", (e) => {
-        const categoryId = card.dataset.categoryId;
-        const site = Discourse.Site.current();
-        const category = site.categories.findBy("id", parseInt(categoryId));
-        
-        if (category) {
-          window.location.href = `/c/${category.slug}/${category.id}`;
-        }
-      });
-      
-      card.addEventListener("mouseenter", () => {
-        card.style.transform = "translateY(-2px)";
-        card.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
-      });
-      
-      card.addEventListener("mouseleave", () => {
-        card.style.transform = "translateY(0)";
-        card.style.boxShadow = "none";
-      });
-    });
+    // Links are handled by native <a> tags, no additional JS needed
   },
   
   removeCategoriesHeader() {
