@@ -30,8 +30,9 @@ export default {
   },
   
   async insertCategoriesHeader() {
-    if (document.querySelector(".dynamic-categories-header")) {
-      return;
+    const existingHeader = document.querySelector(".dynamic-categories-header");
+    if (existingHeader) {
+      existingHeader.remove();
     }
     
     const targetElement = this.findInsertionPoint();
