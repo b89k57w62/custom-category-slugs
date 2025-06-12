@@ -36,7 +36,9 @@ export default {
     console.log("Dynamic Categories Header: Attempting to insert");
     
     // 检查是否启用
-    if (!this.getThemeSetting("enable_header")) {
+    const isEnabled = this.getThemeSetting("show_categories_header");
+    console.log("Dynamic Categories Header: show_categories_header setting:", isEnabled);
+    if (!isEnabled) {
       console.log("Dynamic Categories Header: Disabled by setting");
       return;
     }
@@ -180,8 +182,34 @@ export default {
   
   getThemeSetting(settingName) {
     try {
-      return settings[settingName];
+      // 尝试从全局settings获取
+      if (typeof settings !== 'undefined' && settings[settingName] !== undefined) {
+        return settings[settingName];
+      }
+      
+      // 备用：从主题设置获取
+      const themeSettings = Discourse.SiteSettings;
+      if (themeSettings && themeSettings[settingName] !== undefined) {
+        return themeSettings[settingName];
+      }
+      
+      // 默认值
+      const defaults = {
+        'show_categories_header': true,
+        'max_categories_shown': 8,
+        'categories_per_row': 6,
+        'show_subcategories': false,
+        'show_category_description': false,
+        'show_topic_count': true,
+        'enable_animations': true,
+        'hide_on_category_pages': true
+      };
+      
+      return defaults[settingName] || null;
     } catch (e) {
+      console.log("Dynamic Categories Header: Error getting setting", settingName, e);
+      // 返回默认值
+      if (settingName === 'show_categories_header') return true;
       return null;
     }
   },

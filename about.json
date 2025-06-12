@@ -9,20 +9,10 @@
   "theme_version": "1.0.0",
   "minimum_discourse_version": "2.8.0",
   "settings": {
-    "enable_header": {
-      "type": "bool",
-      "default": true,
-      "description": "啟用動態分類標題顯示"
-    },
     "show_categories_header": {
       "type": "bool",
       "default": true,
-      "description": "Enable dynamic categories display on homepage"
-    },
-    "show_subcategories": {
-      "type": "bool",
-      "default": false,
-      "description": "顯示子分類"
+      "description": "啟用動態分類標題顯示"
     },
     "max_categories_shown": {
       "type": "integer",
@@ -33,6 +23,11 @@
       "type": "integer", 
       "default": 6,
       "description": "每行顯示的分類數量"
+    },
+    "show_subcategories": {
+      "type": "bool",
+      "default": false,
+      "description": "顯示子分類"
     },
     "show_category_description": {
       "type": "bool",
