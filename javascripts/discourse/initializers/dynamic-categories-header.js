@@ -10,22 +10,24 @@ export default {
       const siteSettings = api.container.lookup("site-settings:main");
       const site = api.container.lookup("site:main");
       
+      // 只在首页和最新页显示，避免在分类页重复显示
       api.onPageChange((url, title) => {
-        if (url === "/" || url === "/latest" || url === "/categories") {
-          self.insertCategoriesHeader();
+        if (url === "/" || url === "/latest") {
+          setTimeout(() => {
+            self.insertCategoriesHeader();
+          }, 200);
         } else {
           self.removeCategoriesHeader();
         }
       });
       
-      api.onAppEvent("page:changed", () => {
-        const currentPath = window.location.pathname;
-        if (currentPath === "/" || currentPath === "/latest" || currentPath === "/categories") {
-          setTimeout(() => {
-            self.insertCategoriesHeader();
-          }, 100);
-        }
-      });
+      // 初始化时检查当前页面
+      const currentPath = window.location.pathname;
+      if (currentPath === "/" || currentPath === "/latest") {
+        setTimeout(() => {
+          self.insertCategoriesHeader();
+        }, 300);
+      }
     });
   },
   
@@ -58,19 +60,18 @@ export default {
   },
   
   findInsertionPoint() {
+    // 尝试在广告banner之前插入
     const adBanner = document.querySelector(".google-adsense, .advertisement, [class*='ad-'], [id*='ad-']");
     if (adBanner) {
       return adBanner;
     }
     
-    const searchHeader = document.querySelector("#search-button") || 
-                        document.querySelector(".search-header") ||
-                        document.querySelector("#main-outlet-wrapper > .container > .row");
+    // 在主内容区域开始处插入
+    const mainContent = document.querySelector("#main-outlet .container .row") ||
+                       document.querySelector("#main-outlet .container") ||
+                       document.querySelector("#main-outlet");
     
-    return searchHeader ||
-           document.querySelector("#main-outlet-wrapper .container") || 
-           document.querySelector("#main-outlet") ||
-           document.querySelector(".container.view-categories");
+    return mainContent;
   },
   
   async fetchCategories() {
@@ -95,17 +96,13 @@ export default {
   },
   
   buildCategoriesHeader(categories) {
-    const categoriesPerRow = this.getThemeSetting("categories_per_row") || 4;
+    const categoriesPerRow = this.getThemeSetting("categories_per_row") || 6;
     const showDescription = this.getThemeSetting("show_category_description");
     const showTopicCount = this.getThemeSetting("show_topic_count");
-    const customTitle = this.getThemeSetting("custom_header_title") || "分類";
     
     let html = `
       <div class="categories-header-wrapper">
-        <div class="categories-header-title">
-          <h3>${customTitle}</h3>
-        </div>
-        <div class="categories-grid">
+        <div class="categories-nav">
     `;
     
     categories.forEach(category => {
@@ -117,12 +114,13 @@ export default {
         : "";
       
       html += `
-        <div class="category-item" data-category-id="${category.id}">
-          <a href="/c/${category.slug}/${category.id}" class="category-link">
+        <a href="/c/${category.slug}/${category.id}" class="category-nav-item" data-category-id="${category.id}" style="--category-color: ${categoryColor};">
+          <div class="category-content">
             <span class="category-name">${category.name}</span>
-            ${showTopicCount ? `<span class="category-count">(${topicCount})</span>` : ""}
-          </a>
-        </div>
+            ${showTopicCount ? `<span class="category-count">${topicCount}</span>` : ""}
+            ${description ? `<span class="category-description">${description}</span>` : ""}
+          </div>
+        </a>
       `;
     });
     

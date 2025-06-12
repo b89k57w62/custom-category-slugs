@@ -1,82 +1,86 @@
 .dynamic-categories-header {
-  margin: 24px 0;
-  padding: 0 20px;
-  background: var(--secondary-very-high);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 16px 0;
+  padding: 0;
   
   .categories-header-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px 0;
+    width: 100%;
     
-    .categories-header-title {
-      margin-bottom: 16px;
+    .categories-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--secondary);
+      border: 1px solid var(--primary-low);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       
-      h3 {
-        color: var(--primary);
-        font-size: 20px;
-        font-weight: 700;
-        margin: 0;
-        display: flex;
+      .category-nav-item {
+        display: inline-flex;
         align-items: center;
-        gap: 8px;
+        padding: 6px 14px;
+        background: linear-gradient(135deg, var(--category-color), #{lighten(var(--category-color), 10%)});
+        color: white;
+        text-decoration: none;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1.2;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        position: relative;
+        overflow: hidden;
+        
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          text-decoration: none;
+          
+          &::before {
+            opacity: 1;
+          }
+        }
         
         &::before {
           content: '';
-          width: 4px;
-          height: 20px;
-          background: linear-gradient(135deg, var(--tertiary), var(--quaternary));
-          border-radius: 2px;
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+          opacity: 0;
+          transition: opacity 0.2s ease;
+          pointer-events: none;
         }
-      }
-    }
-    
-    .categories-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      
-      @media (max-width: 768px) {
-        gap: 8px;
-      }
-      
-      .category-item {
-        .category-link {
-          display: inline-flex;
+        
+        .category-content {
+          display: flex;
           align-items: center;
-          padding: 8px 16px;
-          background: var(--primary-very-low);
-          border: 1px solid var(--primary-low);
-          border-radius: 20px;
-          color: var(--primary);
-          text-decoration: none;
-          font-size: 14px;
-          font-weight: 500;
-          transition: all 0.2s ease;
-          white-space: nowrap;
-          
-          &:hover {
-            background: var(--tertiary-low);
-            border-color: var(--tertiary);
-            color: var(--tertiary-high);
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-          }
+          gap: 6px;
+          z-index: 1;
+          position: relative;
           
           .category-name {
-            margin-right: 6px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
           }
           
           .category-count {
-            background: var(--primary-medium);
-            color: var(--secondary-very-high);
-            font-size: 11px;
-            font-weight: 600;
+            background: rgba(255, 255, 255, 0.2);
             padding: 2px 6px;
             border-radius: 10px;
-            min-width: 18px;
-            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(4px);
+          }
+          
+          .category-description {
+            display: none; // 在这个简洁设计中隐藏描述
           }
         }
       }
@@ -84,34 +88,78 @@
   }
 }
 
-body.dark {
+// 深色模式适配
+.dark-mode .dynamic-categories-header {
+  .categories-nav {
+    background: var(--secondary);
+    border-color: var(--primary-medium);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
   .dynamic-categories-header {
-    background: var(--primary-very-low);
-    border: 1px solid var(--primary-low);
+    margin: 12px 0;
     
-    .categories-header-wrapper {
-      .categories-header-title h3 {
-        color: var(--primary-high);
-      }
+    .categories-nav {
+      padding: 8px 12px;
+      gap: 6px;
       
-      .categories-grid {
-        .category-item {
-          .category-link {
-            background: var(--primary-low);
-            border-color: var(--primary-medium);
-            
-            &:hover {
-              background: var(--tertiary-very-low);
-              border-color: var(--tertiary-medium);
-            }
-            
-            .category-count {
-              background: var(--primary-high);
-              color: var(--primary-very-low);
-            }
+      .category-nav-item {
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 16px;
+        
+        .category-content {
+          gap: 4px;
+          
+          .category-count {
+            padding: 1px 4px;
+            font-size: 10px;
           }
         }
       }
     }
+  }
+}
+
+@media (max-width: 480px) {
+  .dynamic-categories-header {
+    .categories-nav {
+      justify-content: flex-start;
+      padding: 6px 8px;
+      
+      .category-nav-item {
+        padding: 4px 8px;
+        font-size: 11px;
+        
+        .category-content .category-count {
+          display: none; // 在极小屏幕隐藏计数
+        }
+      }
+    }
+  }
+}
+
+// 无障碍支持
+.category-nav-item {
+  &:focus {
+    outline: 2px solid var(--tertiary);
+    outline-offset: 2px;
+  }
+  
+  &:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// 动画关闭选项
+.reduce-motion .category-nav-item {
+  transition: none;
+  
+  &:hover {
+    transform: none;
   }
 } 

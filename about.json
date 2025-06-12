@@ -27,10 +27,10 @@
     },
     "categories_per_row": {
       "type": "integer", 
-      "default": 4,
-      "description": "Number of categories to display per row",
-      "min": 1,
-      "max": 6
+      "default": 6,
+      "description": "Maximum number of categories to display",
+      "min": 4,
+      "max": 12
     },
     "show_category_description": {
       "type": "bool",
@@ -47,11 +47,7 @@
       "default": true,
       "description": "Enable hover animations and transitions"
     },
-    "custom_header_title": {
-      "type": "string",
-      "default": "分類",
-      "description": "Custom title for the categories section"
-    },
+
     "hide_on_category_pages": {
       "type": "bool",
       "default": true,
