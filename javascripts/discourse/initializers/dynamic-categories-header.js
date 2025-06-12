@@ -7,15 +7,15 @@ export default {
   initialize() {
     const self = this;
     withPluginApi("0.8.7", (api) => {
-      const siteSettings = api.container.lookup("site-settings:main");
-      const site = api.container.lookup("site:main");
+      console.log("Dynamic Categories Header: Initializing");
       
       // 只在首页和最新页显示，避免在分类页重复显示
       api.onPageChange((url, title) => {
+        console.log("Dynamic Categories Header: Page changed to", url);
         if (url === "/" || url === "/latest") {
           setTimeout(() => {
             self.insertCategoriesHeader();
-          }, 200);
+          }, 500);
         } else {
           self.removeCategoriesHeader();
         }
@@ -23,27 +23,48 @@ export default {
       
       // 初始化时检查当前页面
       const currentPath = window.location.pathname;
+      console.log("Dynamic Categories Header: Current path", currentPath);
       if (currentPath === "/" || currentPath === "/latest") {
         setTimeout(() => {
           self.insertCategoriesHeader();
-        }, 300);
+        }, 800);
       }
     });
   },
   
   async insertCategoriesHeader() {
+    console.log("Dynamic Categories Header: Attempting to insert");
+    
+    // 检查是否启用
+    if (!this.getThemeSetting("enable_header")) {
+      console.log("Dynamic Categories Header: Disabled by setting");
+      return;
+    }
+    
+    // 移除现有的头部
     const existingHeader = document.querySelector(".dynamic-categories-header");
     if (existingHeader) {
       existingHeader.remove();
+      console.log("Dynamic Categories Header: Removed existing header");
     }
     
     const targetElement = this.findInsertionPoint();
     if (!targetElement) {
+      console.log("Dynamic Categories Header: No insertion point found");
       return;
     }
     
+    console.log("Dynamic Categories Header: Found insertion point", targetElement);
+    
     try {
       const categoriesData = await this.fetchCategories();
+      if (!categoriesData || categoriesData.length === 0) {
+        console.log("Dynamic Categories Header: No categories data");
+        return;
+      }
+      
+      console.log("Dynamic Categories Header: Loaded categories", categoriesData.length);
+      
       const headerHtml = this.buildCategoriesHeader(categoriesData);
       
       const headerElement = document.createElement("div");
@@ -52,26 +73,50 @@ export default {
       
       targetElement.insertAdjacentElement("beforebegin", headerElement);
       
-      this.attachClickListeners(headerElement);
+      console.log("Dynamic Categories Header: Successfully inserted");
       
     } catch (error) {
-      console.error("Failed to load categories:", error);
+      console.error("Dynamic Categories Header: Failed to load categories:", error);
     }
   },
   
   findInsertionPoint() {
-    // 尝试在广告banner之前插入
-    const adBanner = document.querySelector(".google-adsense, .advertisement, [class*='ad-'], [id*='ad-']");
+    // 首先尝试在广告banner之前插入
+    const adBanner = document.querySelector(".google-adsense, .advertisement, [class*='ad-'], [id*='ad-'], .google-dfp-ad-unit");
     if (adBanner) {
+      console.log("Dynamic Categories Header: Found ad banner insertion point");
       return adBanner;
     }
     
-    // 在主内容区域开始处插入
-    const mainContent = document.querySelector("#main-outlet .container .row") ||
-                       document.querySelector("#main-outlet .container") ||
-                       document.querySelector("#main-outlet");
+    // 寻找主题列表相关容器
+    const topicListContainer = document.querySelector(".topic-list-container");
+    if (topicListContainer) {
+      console.log("Dynamic Categories Header: Found topic list container");
+      return topicListContainer;
+    }
     
-    return mainContent;
+    const topicList = document.querySelector(".topic-list");
+    if (topicList) {
+      console.log("Dynamic Categories Header: Found topic list");
+      return topicList;
+    }
+    
+    // 寻找主要内容容器
+    const mainContainer = document.querySelector("#main-outlet .container");
+    if (mainContainer) {
+      console.log("Dynamic Categories Header: Found main container");
+      return mainContainer.firstElementChild;
+    }
+    
+    // 最后的备用选项
+    const mainOutlet = document.querySelector("#main-outlet");
+    if (mainOutlet) {
+      console.log("Dynamic Categories Header: Found main outlet");
+      return mainOutlet.firstElementChild;
+    }
+    
+    console.log("Dynamic Categories Header: No suitable insertion point found");
+    return null;
   },
   
   async fetchCategories() {
@@ -96,8 +141,6 @@ export default {
   },
   
   buildCategoriesHeader(categories) {
-    const categoriesPerRow = this.getThemeSetting("categories_per_row") || 6;
-    const showDescription = this.getThemeSetting("show_category_description");
     const showTopicCount = this.getThemeSetting("show_topic_count");
     
     let html = `
@@ -107,18 +150,13 @@ export default {
     
     categories.forEach(category => {
       const categoryColor = category.color ? `#${category.color}` : "#0088cc";
-      const textColor = category.text_color ? `#${category.text_color}` : "#ffffff";
       const topicCount = category.topic_count || 0;
-      const description = showDescription && category.description_excerpt 
-        ? category.description_excerpt 
-        : "";
       
       html += `
         <a href="/c/${category.slug}/${category.id}" class="category-nav-item" data-category-id="${category.id}" style="--category-color: ${categoryColor};">
           <div class="category-content">
             <span class="category-name">${category.name}</span>
             ${showTopicCount ? `<span class="category-count">${topicCount}</span>` : ""}
-            ${description ? `<span class="category-description">${description}</span>` : ""}
           </div>
         </a>
       `;
@@ -132,14 +170,11 @@ export default {
     return html;
   },
   
-  attachClickListeners(headerElement) {
-    // Links are handled by native <a> tags, no additional JS needed
-  },
-  
   removeCategoriesHeader() {
     const existingHeader = document.querySelector(".dynamic-categories-header");
     if (existingHeader) {
       existingHeader.remove();
+      console.log("Dynamic Categories Header: Removed header");
     }
   },
   

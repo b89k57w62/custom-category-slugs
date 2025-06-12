@@ -1,13 +1,19 @@
 {
-  "name": "Dynamic Categories Header",
-  "about_url": "",
-  "license_url": "",
+  "name": "動態分類標題",
+  "about_url": null,
+  "license_url": null,
   "component": true,
+  "color_schemes": {},
   "about": "A theme component that displays categories dynamically above the content area on the homepage.",
   "authors": "Jeffrey",
   "theme_version": "1.0.0",
   "minimum_discourse_version": "2.8.0",
   "settings": {
+    "enable_header": {
+      "type": "bool",
+      "default": true,
+      "description": "啟用動態分類標題顯示"
+    },
     "show_categories_header": {
       "type": "bool",
       "default": true,
@@ -15,43 +21,38 @@
     },
     "show_subcategories": {
       "type": "bool",
-      "default": true,
-      "description": "Whether to show subcategories in the display"
+      "default": false,
+      "description": "顯示子分類"
     },
     "max_categories_shown": {
       "type": "integer",
       "default": 8,
-      "description": "Maximum number of categories to display",
-      "min": 1,
-      "max": 20
+      "description": "顯示的最大分類數量"
     },
     "categories_per_row": {
       "type": "integer", 
       "default": 6,
-      "description": "Maximum number of categories to display",
-      "min": 4,
-      "max": 12
+      "description": "每行顯示的分類數量"
     },
     "show_category_description": {
       "type": "bool",
-      "default": true,
-      "description": "Whether to show category descriptions"
+      "default": false,
+      "description": "顯示分類描述"
     },
     "show_topic_count": {
       "type": "bool",
       "default": true,
-      "description": "Whether to show topic count for each category"
+      "description": "顯示主題數量"
     },
     "enable_animations": {
       "type": "bool",
       "default": true,
-      "description": "Enable hover animations and transitions"
+      "description": "啟用動畫效果"
     },
-
     "hide_on_category_pages": {
       "type": "bool",
       "default": true,
-      "description": "Hide categories header when viewing individual category pages"
+      "description": "在分類頁面隱藏"
     }
   }
 } 
