@@ -36,7 +36,7 @@
     },
     "show_topic_count": {
       "type": "bool",
-      "default": true,
+      "default": false,
       "description": "顯示主題數量"
     },
     "enable_animations": {

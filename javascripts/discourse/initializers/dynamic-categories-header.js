@@ -200,7 +200,7 @@ export default {
         'categories_per_row': 6,
         'show_subcategories': false,
         'show_category_description': false,
-        'show_topic_count': true,
+        'show_topic_count': false,
         'enable_animations': true,
         'hide_on_category_pages': true
       };
