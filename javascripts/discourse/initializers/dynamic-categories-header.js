@@ -7,11 +7,8 @@ export default {
   initialize() {
     const self = this;
     withPluginApi("0.8.7", (api) => {
-      console.log("Dynamic Categories Header: Initializing");
       
-      // 只在首页和最新页显示，避免在分类页重复显示
       api.onPageChange((url, title) => {
-        console.log("Dynamic Categories Header: Page changed to", url);
         if (url === "/" || url === "/latest") {
           setTimeout(() => {
             self.insertCategoriesHeader();
@@ -21,9 +18,7 @@ export default {
         }
       });
       
-      // 初始化时检查当前页面
       const currentPath = window.location.pathname;
-      console.log("Dynamic Categories Header: Current path", currentPath);
       if (currentPath === "/" || currentPath === "/latest") {
         setTimeout(() => {
           self.insertCategoriesHeader();
@@ -33,39 +28,29 @@ export default {
   },
   
   async insertCategoriesHeader() {
-    console.log("Dynamic Categories Header: Attempting to insert");
     
-    // 检查是否启用
     const isEnabled = this.getThemeSetting("show_categories_header");
-    console.log("Dynamic Categories Header: show_categories_header setting:", isEnabled);
     if (!isEnabled) {
-      console.log("Dynamic Categories Header: Disabled by setting");
       return;
     }
     
-    // 移除现有的头部
     const existingHeader = document.querySelector(".dynamic-categories-header");
     if (existingHeader) {
       existingHeader.remove();
-      console.log("Dynamic Categories Header: Removed existing header");
     }
     
     const targetElement = this.findInsertionPoint();
     if (!targetElement) {
-      console.log("Dynamic Categories Header: No insertion point found");
       return;
     }
     
-    console.log("Dynamic Categories Header: Found insertion point", targetElement);
     
     try {
       const categoriesData = await this.fetchCategories();
       if (!categoriesData || categoriesData.length === 0) {
-        console.log("Dynamic Categories Header: No categories data");
         return;
       }
       
-      console.log("Dynamic Categories Header: Loaded categories", categoriesData.length);
       
       const headerHtml = this.buildCategoriesHeader(categoriesData);
       
@@ -75,49 +60,38 @@ export default {
       
       targetElement.insertAdjacentElement("beforebegin", headerElement);
       
-      console.log("Dynamic Categories Header: Successfully inserted");
       
     } catch (error) {
-      console.error("Dynamic Categories Header: Failed to load categories:", error);
+      console.error("Failed to load categories:", error);
     }
   },
   
   findInsertionPoint() {
-    // 首先尝试在广告banner之前插入
     const adBanner = document.querySelector(".google-adsense, .advertisement, [class*='ad-'], [id*='ad-'], .google-dfp-ad-unit");
     if (adBanner) {
-      console.log("Dynamic Categories Header: Found ad banner insertion point");
       return adBanner;
     }
     
-    // 寻找主题列表相关容器
     const topicListContainer = document.querySelector(".topic-list-container");
     if (topicListContainer) {
-      console.log("Dynamic Categories Header: Found topic list container");
       return topicListContainer;
     }
     
     const topicList = document.querySelector(".topic-list");
     if (topicList) {
-      console.log("Dynamic Categories Header: Found topic list");
       return topicList;
     }
     
-    // 寻找主要内容容器
     const mainContainer = document.querySelector("#main-outlet .container");
     if (mainContainer) {
-      console.log("Dynamic Categories Header: Found main container");
       return mainContainer.firstElementChild;
     }
     
-    // 最后的备用选项
     const mainOutlet = document.querySelector("#main-outlet");
     if (mainOutlet) {
-      console.log("Dynamic Categories Header: Found main outlet");
       return mainOutlet.firstElementChild;
     }
     
-    console.log("Dynamic Categories Header: No suitable insertion point found");
     return null;
   },
   
@@ -176,24 +150,20 @@ export default {
     const existingHeader = document.querySelector(".dynamic-categories-header");
     if (existingHeader) {
       existingHeader.remove();
-      console.log("Dynamic Categories Header: Removed header");
     }
   },
   
   getThemeSetting(settingName) {
     try {
-      // 尝试从全局settings获取
       if (typeof settings !== 'undefined' && settings[settingName] !== undefined) {
         return settings[settingName];
       }
       
-      // 备用：从主题设置获取
       const themeSettings = Discourse.SiteSettings;
       if (themeSettings && themeSettings[settingName] !== undefined) {
         return themeSettings[settingName];
       }
       
-      // 默认值
       const defaults = {
         'show_categories_header': true,
         'max_categories_shown': 8,
@@ -207,8 +177,6 @@ export default {
       
       return defaults[settingName] || null;
     } catch (e) {
-      console.log("Dynamic Categories Header: Error getting setting", settingName, e);
-      // 返回默认值
       if (settingName === 'show_categories_header') return true;
       return null;
     }

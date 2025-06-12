@@ -1,3 +1,6 @@
+// Dynamic Categories Header Theme Component
+// 現代化水平分類導航欄
+
 .dynamic-categories-header {
   margin: 20px 0;
   padding: 0;
@@ -206,36 +209,4 @@ a.category-nav-item {
 
 .category-nav-item:focus-visible {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 0 0 0 3px var(--tertiary);
-}
-
-// 减少动画选项
-@media (prefers-reduced-motion: reduce) {
-  .category-nav-item {
-    transition: none;
-    
-    &:hover {
-      transform: none;
-    }
-    
-    &::before {
-      display: none;
-    }
-  }
-}
-
-// 高对比度模式
-@media (prefers-contrast: high) {
-  .dynamic-categories-header {
-    .categories-header-wrapper {
-      border: 2px solid var(--primary);
-    }
-    
-    .category-nav-item {
-      border: 2px solid rgba(255, 255, 255, 0.5);
-      
-      &:hover {
-        border-color: white;
-      }
-    }
-  }
 } 
