@@ -1,0 +1,61 @@
+{
+  "name": "Dynamic Categories Header",
+  "about_url": "",
+  "license_url": "",
+  "component": true,
+  "about": "A theme component that displays categories dynamically above the content area on the homepage.",
+  "authors": "Jeffrey",
+  "theme_version": "1.0.0",
+  "minimum_discourse_version": "2.8.0",
+  "settings": {
+    "show_categories_header": {
+      "type": "bool",
+      "default": true,
+      "description": "Enable dynamic categories display on homepage"
+    },
+    "show_subcategories": {
+      "type": "bool",
+      "default": true,
+      "description": "Whether to show subcategories in the display"
+    },
+    "max_categories_shown": {
+      "type": "integer",
+      "default": 8,
+      "description": "Maximum number of categories to display",
+      "min": 1,
+      "max": 20
+    },
+    "categories_per_row": {
+      "type": "integer", 
+      "default": 4,
+      "description": "Number of categories to display per row",
+      "min": 1,
+      "max": 6
+    },
+    "show_category_description": {
+      "type": "bool",
+      "default": true,
+      "description": "Whether to show category descriptions"
+    },
+    "show_topic_count": {
+      "type": "bool",
+      "default": true,
+      "description": "Whether to show topic count for each category"
+    },
+    "enable_animations": {
+      "type": "bool",
+      "default": true,
+      "description": "Enable hover animations and transitions"
+    },
+    "custom_header_title": {
+      "type": "string",
+      "default": "分類",
+      "description": "Custom title for the categories section"
+    },
+    "hide_on_category_pages": {
+      "type": "bool",
+      "default": true,
+      "description": "Hide categories header when viewing individual category pages"
+    }
+  }
+} 
