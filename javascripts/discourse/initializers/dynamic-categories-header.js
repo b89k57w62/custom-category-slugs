@@ -4,8 +4,10 @@ import { ajax } from "discourse/lib/ajax";
 export default {
   name: "dynamic-categories-header",
   
-  initialize() {
+  initialize(container) {
     const self = this;
+    this.siteSettings = container.lookup("service:site-settings");
+    
     withPluginApi("0.8.7", (api) => {
       
       api.onPageChange((url, title) => {
@@ -159,9 +161,8 @@ export default {
         return settings[settingName];
       }
       
-      const themeSettings = Discourse.SiteSettings;
-      if (themeSettings && themeSettings[settingName] !== undefined) {
-        return themeSettings[settingName];
+      if (this.siteSettings && this.siteSettings[settingName] !== undefined) {
+        return this.siteSettings[settingName];
       }
       
       const defaults = {
