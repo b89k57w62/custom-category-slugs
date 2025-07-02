@@ -1,16 +1,26 @@
 
-body .wrap .container .dynamic-categories-header,
-#main-outlet .dynamic-categories-header,
-.discourse-root .dynamic-categories-header {
-  margin: 20px 0;
+/* 确保无论插入到哪里都能正确显示 */
+.dynamic-categories-header {
+  margin: 20px auto;
   padding: 0;
   width: 100%;
-  max-width: 100%;
+  max-width: 1110px; /* 匹配Discourse主容器宽度 */
   position: relative;
   z-index: 10;
   box-sizing: border-box;
   display: block;
   clear: both;
+  
+  /* 移动版默认不使用transform */
+  left: auto;
+  transform: none;
+  
+  /* 如果被插入到广告横幅附近，确保正确定位 */
+  &:before {
+    content: "";
+    display: block;
+    clear: both;
+  }
   
   .categories-header-wrapper {
     width: 100%;
@@ -111,9 +121,8 @@ body .wrap .container .dynamic-categories-header,
   }
 }
 
-body.dark-mode .wrap .container .dynamic-categories-header,
-body.dark-mode #main-outlet .dynamic-categories-header,
-body.dark-mode .discourse-root .dynamic-categories-header {
+/* 暗色模式样式 */
+body.dark-mode .dynamic-categories-header {
   .categories-nav {
     border-bottom-color: var(--primary-high);
   }
@@ -140,10 +149,9 @@ body.dark-mode .discourse-root .dynamic-categories-header {
 }
 
 @media (max-width: 1024px) {
-  body .wrap .container .dynamic-categories-header,
-  #main-outlet .dynamic-categories-header,
-  .discourse-root .dynamic-categories-header {
-    margin: 16px 0;
+  .dynamic-categories-header {
+    margin: 16px auto;
+    max-width: 95%;
     
     .category-nav-item {
       padding: 10px 20px;
@@ -154,11 +162,11 @@ body.dark-mode .discourse-root .dynamic-categories-header {
 }
 
 @media (max-width: 768px) {
-  body .wrap .container .dynamic-categories-header,
-  #main-outlet .dynamic-categories-header,
-  .discourse-root .dynamic-categories-header {
-    margin: 12px 0;
-    width: 100%;
+  .dynamic-categories-header {
+    margin: 12px auto;
+    max-width: 100%;
+    transform: none;
+    left: auto;
     
     .categories-nav {
       overflow-x: auto;
@@ -185,10 +193,8 @@ body.dark-mode .discourse-root .dynamic-categories-header {
 }
 
 @media (max-width: 480px) {
-  body .wrap .container .dynamic-categories-header,
-  #main-outlet .dynamic-categories-header,
-  .discourse-root .dynamic-categories-header {
-    margin: 8px 0;
+  .dynamic-categories-header {
+    margin: 8px auto;
     
     .category-nav-item {
       padding: 6px 12px;
@@ -202,9 +208,8 @@ body.dark-mode .discourse-root .dynamic-categories-header {
   }
 }
 
-body .wrap .container .dynamic-categories-header a.category-nav-item,
-#main-outlet .dynamic-categories-header a.category-nav-item,
-.discourse-root .dynamic-categories-header a.category-nav-item {
+/* 链接样式强化 */
+.dynamic-categories-header a.category-nav-item {
   color: var(--primary);
   text-decoration: none;
   
@@ -225,24 +230,82 @@ body .wrap .container .dynamic-categories-header a.category-nav-item,
   outline: none;
 }
 
-body .wrap .container .dynamic-categories-header,
-#main-outlet .dynamic-categories-header,
-.discourse-root .dynamic-categories-header {
-  box-sizing: border-box;
-  
-  &:before,
+/* 防止样式冲突的额外保护 */
+.dynamic-categories-header {
+  /* 覆盖任何可能的冲突样式 */
   &:after {
-    content: none;
+    content: "";
+    display: block;
+    clear: both;
   }
   
-  float: none;
-  position: relative;
-  left: auto;
-  right: auto;
-  top: auto;
-  bottom: auto;
-  
+  /* 确保所有子元素使用正确的盒模型 */
   * {
     box-sizing: border-box;
+  }
+  
+  /* 防止被float元素影响 */
+  overflow: hidden;
+}
+
+/* 特殊情况处理：当被插入到广告横幅附近时 */
+.advertisement + .dynamic-categories-header,
+[class*="ad-"] + .dynamic-categories-header,
+[id*="ad-"] + .dynamic-categories-header,
+.google-adsense + .dynamic-categories-header,
+.google-dfp-ad-unit + .dynamic-categories-header {
+  margin-top: 20px;
+  position: relative;
+  z-index: 999;
+}
+
+/* 确保在页面顶部正确显示 */
+#main-outlet > .dynamic-categories-header:first-child,
+.container > .dynamic-categories-header:first-child {
+  margin-top: 20px;
+}
+
+/* 桌面版特殊处理 - 解决被挤压到右上角的问题 */
+@media (min-width: 769px) {
+  .dynamic-categories-header {
+    /* 确保在桌面版正确居中 */
+    margin: 20px auto;
+    width: 100%;
+    max-width: 1110px;
+    display: block;
+    clear: both;
+    
+    /* 重置任何可能的定位问题 */
+    position: static;
+    left: auto;
+    right: auto;
+    transform: none;
+    float: none;
+    
+    /* 确保容器有足够的空间 */
+    box-sizing: border-box;
+    
+    .categories-header-wrapper {
+      width: 100%;
+      margin: 0 auto;
+      display: block;
+    }
+    
+    .categories-nav {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: flex-start;
+    }
+  }
+  
+  /* 如果被插入到广告横幅旁边，强制换行 */
+  .advertisement .dynamic-categories-header,
+  [class*="ad-"] .dynamic-categories-header {
+    display: block;
+    width: 100%;
+    clear: both;
+    margin: 20px auto;
   }
 }
