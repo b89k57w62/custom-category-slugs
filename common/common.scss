@@ -1,14 +1,26 @@
-.dynamic-categories-header {
+
+body .wrap .container .dynamic-categories-header,
+#main-outlet .dynamic-categories-header,
+.discourse-root .dynamic-categories-header {
   margin: 20px 0;
   padding: 0;
   width: 100%;
+  max-width: 100%;
+  position: relative;
+  z-index: 10;
+  box-sizing: border-box;
+  display: block;
+  clear: both;
   
   .categories-header-wrapper {
     width: 100%;
+    max-width: 100%;
     background: transparent;
     padding: 0;
     border: none;
     box-shadow: none;
+    box-sizing: border-box;
+    display: block;
   }
   
   .categories-nav {
@@ -21,6 +33,12 @@
     padding: 0;
     background: transparent;
     border-bottom: 1px solid var(--primary-low);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    left: 0;
+    right: 0;
   }
   
   .category-nav-item {
@@ -29,8 +47,8 @@
     justify-content: center;
     padding: 12px 24px;
     background: transparent;
-    color: var(--primary) !important;
-    text-decoration: none !important;
+    color: var(--primary);
+    text-decoration: none;
     border-radius: 0;
     font-size: 14px;
     font-weight: 500;
@@ -43,18 +61,20 @@
     white-space: nowrap;
     min-height: 48px;
     box-shadow: none;
+    box-sizing: border-box;
+    flex-shrink: 0;
     
     &:hover {
       background: var(--primary-very-low);
-      color: var(--primary) !important;
-      text-decoration: none !important;
+      color: var(--primary);
+      text-decoration: none;
       border-bottom-color: var(--primary-medium);
     }
     
     &.active,
     &:active {
       background: var(--primary-very-low);
-      color: var(--primary) !important;
+      color: var(--primary);
       border-bottom-color: var(--primary);
       font-weight: 600;
     }
@@ -75,7 +95,7 @@
   
   .category-name {
     font-weight: inherit;
-    color: inherit !important;
+    color: inherit;
     letter-spacing: 0.2px;
   }
   
@@ -85,19 +105,21 @@
     border-radius: 10px;
     font-size: 11px;
     font-weight: 600;
-    color: var(--primary) !important;
+    color: var(--primary);
     min-width: 18px;
     text-align: center;
   }
 }
 
-.dark-mode .dynamic-categories-header {
+body.dark-mode .wrap .container .dynamic-categories-header,
+body.dark-mode #main-outlet .dynamic-categories-header,
+body.dark-mode .discourse-root .dynamic-categories-header {
   .categories-nav {
     border-bottom-color: var(--primary-high);
   }
   
   .category-nav-item {
-    color: var(--primary) !important;
+    color: var(--primary);
     
     &:hover {
       background: var(--primary-very-high);
@@ -113,13 +135,14 @@
   
   .category-count {
     background: var(--primary-high);
-    color: var(--primary) !important;
+    color: var(--primary);
   }
 }
 
-// 响应式设计
 @media (max-width: 1024px) {
-  .dynamic-categories-header {
+  body .wrap .container .dynamic-categories-header,
+  #main-outlet .dynamic-categories-header,
+  .discourse-root .dynamic-categories-header {
     margin: 16px 0;
     
     .category-nav-item {
@@ -131,12 +154,16 @@
 }
 
 @media (max-width: 768px) {
-  .dynamic-categories-header {
+  body .wrap .container .dynamic-categories-header,
+  #main-outlet .dynamic-categories-header,
+  .discourse-root .dynamic-categories-header {
     margin: 12px 0;
+    width: 100%;
     
     .categories-nav {
       overflow-x: auto;
       flex-wrap: nowrap;
+      width: 100%;
     }
     
     .category-nav-item {
@@ -158,7 +185,9 @@
 }
 
 @media (max-width: 480px) {
-  .dynamic-categories-header {
+  body .wrap .container .dynamic-categories-header,
+  #main-outlet .dynamic-categories-header,
+  .discourse-root .dynamic-categories-header {
     margin: 8px 0;
     
     .category-nav-item {
@@ -173,24 +202,47 @@
   }
 }
 
-a.category-nav-item {
-  color: var(--primary) !important;
-  text-decoration: none !important;
+body .wrap .container .dynamic-categories-header a.category-nav-item,
+#main-outlet .dynamic-categories-header a.category-nav-item,
+.discourse-root .dynamic-categories-header a.category-nav-item {
+  color: var(--primary);
+  text-decoration: none;
   
   &:link,
   &:visited {
-    color: var(--primary) !important;
-    text-decoration: none !important;
+    color: var(--primary);
+    text-decoration: none;
   }
   
   &:hover,
   &:focus {
-    color: var(--primary) !important;
-    text-decoration: none !important;
+    color: var(--primary);
+    text-decoration: none;
   }
 }
 
-// 移除焦点轮廓
 .category-nav-item:focus-visible {
   outline: none;
-} 
+}
+
+body .wrap .container .dynamic-categories-header,
+#main-outlet .dynamic-categories-header,
+.discourse-root .dynamic-categories-header {
+  box-sizing: border-box;
+  
+  &:before,
+  &:after {
+    content: none;
+  }
+  
+  float: none;
+  position: relative;
+  left: auto;
+  right: auto;
+  top: auto;
+  bottom: auto;
+  
+  * {
+    box-sizing: border-box;
+  }
+}
