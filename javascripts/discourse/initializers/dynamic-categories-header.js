@@ -3,6 +3,8 @@ import { ajax } from "discourse/lib/ajax";
 
 export default {
   name: "dynamic-categories-header",
+  insertTimeout: null,
+  isInserting: false,
   
   initialize(container) {
     const self = this;
@@ -11,8 +13,13 @@ export default {
     withPluginApi("0.8.7", (api) => {
       
       api.onPageChange((url, title) => {
+        if (self.insertTimeout) {
+          clearTimeout(self.insertTimeout);
+          self.insertTimeout = null;
+        }
+        
         if (url === "/" || url === "/latest") {
-          setTimeout(() => {
+          self.insertTimeout = setTimeout(() => {
             self.insertCategoriesHeader();
           }, 500);
         } else {
@@ -22,7 +29,7 @@ export default {
       
       const currentPath = window.location.pathname;
       if (currentPath === "/" || currentPath === "/latest") {
-        setTimeout(() => {
+        self.insertTimeout = setTimeout(() => {
           self.insertCategoriesHeader();
         }, 800);
       }
@@ -30,41 +37,57 @@ export default {
   },
   
   async insertCategoriesHeader() {
-    
-    const isEnabled = this.getThemeSetting("show_categories_header");
-    if (!isEnabled) {
+    // 防止重复插入
+    if (this.isInserting) {
       return;
     }
     
-    const existingHeader = document.querySelector(".dynamic-categories-header");
-    if (existingHeader) {
-      existingHeader.remove();
-    }
+    this.isInserting = true;
     
-    const targetElement = this.findInsertionPoint();
-    if (!targetElement) {
-      return;
-    }
-    
-    
-    try {
-      const categoriesData = await this.fetchCategories();
-      if (!categoriesData || categoriesData.length === 0) {
-        return;
-      }
+         try {
+       const isEnabled = this.getThemeSetting("show_categories_header");
+       if (!isEnabled) {
+         this.isInserting = false;
+         return;
+       }
+       
+       this.removeCategoriesHeader();
+       this.isInserting = true; 
+       
+       const targetElement = this.findInsertionPoint();
+       if (!targetElement) {
+         this.isInserting = false;
+         return;
+       }
+       
+       const categoriesData = await this.fetchCategories();
+       if (!categoriesData || categoriesData.length === 0) {
+         this.isInserting = false;
+         return;
+       }
       
+       const stillExistsById = document.getElementById("dynamic-categories-header-unique");
+       const stillExistsByClass = document.querySelector(".dynamic-categories-header");
+       if (stillExistsById || stillExistsByClass) {
+         this.removeCategoriesHeader();
+         this.isInserting = true;
+       }
       
       const headerHtml = this.buildCategoriesHeader(categoriesData);
       
-      const headerElement = document.createElement("div");
-      headerElement.innerHTML = headerHtml;
-      headerElement.className = "dynamic-categories-header";
-      
-      targetElement.insertAdjacentElement("beforebegin", headerElement);
-      
+             const headerElement = document.createElement("div");
+       headerElement.innerHTML = headerHtml;
+       headerElement.className = "dynamic-categories-header";
+       headerElement.id = "dynamic-categories-header-unique";
+       
+       if (targetElement && targetElement.parentNode) {
+         targetElement.insertAdjacentElement("beforebegin", headerElement);
+       }
       
     } catch (error) {
       console.error("Failed to load categories:", error);
+    } finally {
+      this.isInserting = false;
     }
   },
   
@@ -149,9 +172,23 @@ export default {
   },
   
   removeCategoriesHeader() {
-    const existingHeader = document.querySelector(".dynamic-categories-header");
-    if (existingHeader) {
-      existingHeader.remove();
+    const headerById = document.getElementById("dynamic-categories-header-unique");
+    if (headerById) {
+      headerById.remove();
+    }
+    
+    const existingHeaders = document.querySelectorAll(".dynamic-categories-header");
+    existingHeaders.forEach(header => {
+      if (header && header.parentNode) {
+        header.remove();
+      }
+    });
+    
+    this.isInserting = false;
+    
+    if (this.insertTimeout) {
+      clearTimeout(this.insertTimeout);
+      this.insertTimeout = null;
     }
   },
   
