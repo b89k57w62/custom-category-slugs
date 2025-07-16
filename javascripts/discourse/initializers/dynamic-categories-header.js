@@ -7,28 +7,35 @@ export default {
   isInserting: false,
   
   initialize(container) {
+    console.log('[DEBUG] Component initializing...');
     const self = this;
     this.siteSettings = container.lookup("service:site-settings");
     
     withPluginApi("0.8.7", (api) => {
+      console.log('[DEBUG] Plugin API ready');
       
       api.onPageChange((url, title) => {
+        console.log('[DEBUG] Page change detected:', url);
         if (self.insertTimeout) {
           clearTimeout(self.insertTimeout);
           self.insertTimeout = null;
         }
         
         if (url === "/" || url === "/latest") {
+          console.log('[DEBUG] Homepage detected, scheduling insertion');
           self.insertTimeout = setTimeout(() => {
             self.insertCategoriesHeader();
           }, 500);
         } else {
+          console.log('[DEBUG] Non-homepage, removing header');
           self.removeCategoriesHeader();
         }
       });
       
       const currentPath = window.location.pathname;
+      console.log('[DEBUG] Current path:', currentPath);
       if (currentPath === "/" || currentPath === "/latest") {
+        console.log('[DEBUG] Initial homepage load, scheduling insertion');
         self.insertTimeout = setTimeout(() => {
           self.insertCategoriesHeader();
         }, 800);
@@ -37,8 +44,11 @@ export default {
   },
   
   async insertCategoriesHeader() {
+    console.log('[DEBUG] insertCategoriesHeader called');
+    
     // 防止重复插入
     if (this.isInserting) {
+      console.log('[DEBUG] Already inserting, returning');
       return;
     }
     
@@ -46,7 +56,9 @@ export default {
     
          try {
        const isEnabled = this.getThemeSetting("show_categories_header");
+       console.log('[DEBUG] Categories header enabled:', isEnabled);
        if (!isEnabled) {
+         console.log('[DEBUG] Categories header disabled, exiting');
          this.isInserting = false;
          return;
        }
@@ -55,13 +67,17 @@ export default {
        this.isInserting = true; 
        
        const targetElement = this.findInsertionPoint();
+       console.log('[DEBUG] Target element found:', targetElement ? targetElement.className : 'null');
        if (!targetElement) {
+         console.log('[DEBUG] No target element found, exiting');
          this.isInserting = false;
          return;
        }
        
        const categoriesData = await this.fetchCategories();
+       console.log('[DEBUG] Categories data:', categoriesData ? categoriesData.length : 'null', 'categories');
        if (!categoriesData || categoriesData.length === 0) {
+         console.log('[DEBUG] No categories data, exiting');
          this.isInserting = false;
          return;
        }
@@ -74,14 +90,23 @@ export default {
        }
       
       const headerHtml = this.buildCategoriesHeader(categoriesData);
+      console.log('[DEBUG] Header HTML built, length:', headerHtml.length);
       
              const headerElement = document.createElement("div");
        headerElement.innerHTML = headerHtml;
        headerElement.className = "dynamic-categories-header";
        headerElement.id = "dynamic-categories-header-unique";
        
+       console.log('[DEBUG] Header element created, inserting...');
        if (targetElement && targetElement.parentNode) {
          targetElement.insertAdjacentElement("beforebegin", headerElement);
+         console.log('[DEBUG] Header element inserted successfully');
+         
+         // 验证插入是否成功
+         const inserted = document.getElementById("dynamic-categories-header-unique");
+         console.log('[DEBUG] Verification - element exists after insertion:', inserted !== null);
+       } else {
+         console.log('[DEBUG] Cannot insert - no target element or parent');
        }
       
     } catch (error) {
