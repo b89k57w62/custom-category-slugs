@@ -117,66 +117,48 @@ export default {
   },
   
   findInsertionPoint() {
-    // 首先尋找廣告橫幅（如果有的話）
-    const adBanner = document.querySelector(".google-adsense, .advertisement, [class*='ad-'], [id*='ad-'], .google-dfp-ad-unit");
-    if (adBanner) {
-      return adBanner;
-    }
+    console.log('[DEBUG] Finding insertion point with universal strategy...');
     
-    // 處理登录用戶的DOM結構  
-    const listControls = document.querySelector(".list-controls");
-    if (listControls) {
-      return listControls;
-    }
+    // 使用通用策略：寻找主内容区域，适用于所有用户状态
     
-    // 查找 list-container（登录用户特有）
-    const listContainer = document.querySelector(".list-container");
-    if (listContainer) {
-      return listContainer;
-    }
+    // 1. 寻找包含实际内容的container，跳过banner
+    const containers = document.querySelectorAll("#main-outlet > .container");
+    console.log('[DEBUG] Found containers:', containers.length);
     
-    const navigationContainer = document.querySelector(".navigation-container");
-    if (navigationContainer) {
-      return navigationContainer;
-    }
-    
-    const topicListHeader = document.querySelector(".topic-list-header");
-    if (topicListHeader) {
-      return topicListHeader;
-    }
-    
-    // 改進的邏輯：尋找更精確的插入點
-    // 優先尋找主要內容區域的第一個元素
-    const mainContainer = document.querySelector("#main-outlet .container");
-    if (mainContainer) {
-      // 尋找 .row 或其他直接內容容器
-      const contentRow = mainContainer.querySelector(".row, .contents");
-      if (contentRow) {
-        return contentRow;
-      }
-      // 如果沒有找到，返回 mainContainer 的第一個子元素
-      if (mainContainer.firstElementChild) {
-        return mainContainer.firstElementChild;
+    for (let i = 0; i < containers.length; i++) {
+      const container = containers[i];
+      console.log(`[DEBUG] Container ${i}:`, container.className);
+      
+      // 跳过banner和搜索相关的容器
+      if (!container.classList.contains('search-banner') && 
+          !container.classList.contains('welcome-banner') &&
+          !container.className.includes('above-main-container-outlet')) {
+        console.log('[DEBUG] Selected main content container:', container.className);
+        return container;
       }
     }
     
-    // 備選方案：尋找 topic list 相關元素
-    const topicListContainer = document.querySelector(".topic-list-container");
-    if (topicListContainer) {
-      return topicListContainer;
-    }
-    
-    const topicList = document.querySelector(".topic-list");
-    if (topicList) {
-      return topicList;
-    }
-    
-    // 最後的備選方案
+    // 2. 如果没找到合适的container，寻找第一个非banner元素
     const mainOutlet = document.querySelector("#main-outlet");
-    if (mainOutlet && mainOutlet.firstElementChild) {
-      return mainOutlet.firstElementChild;
+    if (mainOutlet) {
+      const children = Array.from(mainOutlet.children);
+      console.log('[DEBUG] main-outlet children:', children.length);
+      
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        console.log(`[DEBUG] Child ${i}:`, child.className);
+        
+        // 跳过各种banner
+        if (!child.classList.contains('above-main-container-outlet') && 
+            !child.classList.contains('welcome-banner') &&
+            !child.classList.contains('search-banner')) {
+          console.log('[DEBUG] Selected first content element:', child.className);
+          return child;
+        }
+      }
     }
     
+    console.log('[DEBUG] No suitable insertion point found');
     return null;
   },
   
