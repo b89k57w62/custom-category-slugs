@@ -12,6 +12,9 @@
   left: auto;
   transform: none;
   
+  // 確保頭部總是在其他內容之前顯示
+  order: -999 !important;
+  
   &:before {
     content: "";
     display: block;

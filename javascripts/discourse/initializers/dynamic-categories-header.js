@@ -92,11 +92,44 @@ export default {
   },
   
   findInsertionPoint() {
+    // 首先尋找廣告橫幅（如果有的話）
     const adBanner = document.querySelector(".google-adsense, .advertisement, [class*='ad-'], [id*='ad-'], .google-dfp-ad-unit");
     if (adBanner) {
       return adBanner;
     }
     
+    // 處理登录用戶的DOM結構
+    const listControls = document.querySelector(".list-controls");
+    if (listControls) {
+      return listControls;
+    }
+    
+    const navigationContainer = document.querySelector(".navigation-container");
+    if (navigationContainer) {
+      return navigationContainer;
+    }
+    
+    const topicListHeader = document.querySelector(".topic-list-header");
+    if (topicListHeader) {
+      return topicListHeader;
+    }
+    
+    // 改進的邏輯：尋找更精確的插入點
+    // 優先尋找主要內容區域的第一個元素
+    const mainContainer = document.querySelector("#main-outlet .container");
+    if (mainContainer) {
+      // 尋找 .row 或其他直接內容容器
+      const contentRow = mainContainer.querySelector(".row, .contents");
+      if (contentRow) {
+        return contentRow;
+      }
+      // 如果沒有找到，返回 mainContainer 的第一個子元素
+      if (mainContainer.firstElementChild) {
+        return mainContainer.firstElementChild;
+      }
+    }
+    
+    // 備選方案：尋找 topic list 相關元素
     const topicListContainer = document.querySelector(".topic-list-container");
     if (topicListContainer) {
       return topicListContainer;
@@ -107,13 +140,9 @@ export default {
       return topicList;
     }
     
-    const mainContainer = document.querySelector("#main-outlet .container");
-    if (mainContainer) {
-      return mainContainer.firstElementChild;
-    }
-    
+    // 最後的備選方案
     const mainOutlet = document.querySelector("#main-outlet");
-    if (mainOutlet) {
+    if (mainOutlet && mainOutlet.firstElementChild) {
       return mainOutlet.firstElementChild;
     }
     
