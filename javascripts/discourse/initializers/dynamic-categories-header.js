@@ -7,35 +7,27 @@ export default {
   isInserting: false,
   
   initialize(container) {
-    console.log('[DEBUG] Component initializing...');
     const self = this;
     this.siteSettings = container.lookup("service:site-settings");
     
     withPluginApi("0.8.7", (api) => {
-      console.log('[DEBUG] Plugin API ready');
-      
       api.onPageChange((url, title) => {
-        console.log('[DEBUG] Page change detected:', url);
         if (self.insertTimeout) {
           clearTimeout(self.insertTimeout);
           self.insertTimeout = null;
         }
         
         if (url === "/" || url === "/latest") {
-          console.log('[DEBUG] Homepage detected, scheduling insertion');
           self.insertTimeout = setTimeout(() => {
             self.insertCategoriesHeader();
           }, 500);
         } else {
-          console.log('[DEBUG] Non-homepage, removing header');
           self.removeCategoriesHeader();
         }
       });
       
       const currentPath = window.location.pathname;
-      console.log('[DEBUG] Current path:', currentPath);
       if (currentPath === "/" || currentPath === "/latest") {
-        console.log('[DEBUG] Initial homepage load, scheduling insertion');
         self.insertTimeout = setTimeout(() => {
           self.insertCategoriesHeader();
         }, 800);
@@ -44,70 +36,50 @@ export default {
   },
   
   async insertCategoriesHeader() {
-    console.log('[DEBUG] insertCategoriesHeader called');
-    
-    // 防止重复插入
     if (this.isInserting) {
-      console.log('[DEBUG] Already inserting, returning');
       return;
     }
     
     this.isInserting = true;
     
-         try {
-       const isEnabled = this.getThemeSetting("show_categories_header");
-       console.log('[DEBUG] Categories header enabled:', isEnabled);
-       if (!isEnabled) {
-         console.log('[DEBUG] Categories header disabled, exiting');
-         this.isInserting = false;
-         return;
-       }
-       
-       this.removeCategoriesHeader();
-       this.isInserting = true; 
-       
-       const targetElement = this.findInsertionPoint();
-       console.log('[DEBUG] Target element found:', targetElement ? targetElement.className : 'null');
-       if (!targetElement) {
-         console.log('[DEBUG] No target element found, exiting');
-         this.isInserting = false;
-         return;
-       }
-       
-       const categoriesData = await this.fetchCategories();
-       console.log('[DEBUG] Categories data:', categoriesData ? categoriesData.length : 'null', 'categories');
-       if (!categoriesData || categoriesData.length === 0) {
-         console.log('[DEBUG] No categories data, exiting');
-         this.isInserting = false;
-         return;
-       }
+    try {
+      const isEnabled = this.getThemeSetting("show_categories_header");
+      if (!isEnabled) {
+        this.isInserting = false;
+        return;
+      }
       
-       const stillExistsById = document.getElementById("dynamic-categories-header-unique");
-       const stillExistsByClass = document.querySelector(".dynamic-categories-header");
-       if (stillExistsById || stillExistsByClass) {
-         this.removeCategoriesHeader();
-         this.isInserting = true;
-       }
+      this.removeCategoriesHeader();
+      this.isInserting = true;
+      
+      const targetElement = this.findInsertionPoint();
+      if (!targetElement) {
+        this.isInserting = false;
+        return;
+      }
+      
+      const categoriesData = await this.fetchCategories();
+      if (!categoriesData || categoriesData.length === 0) {
+        this.isInserting = false;
+        return;
+      }
+      
+             const stillExistsById = document.getElementById("dynamic-categories-header-unique");
+      const stillExistsByClass = document.querySelector(".dynamic-categories-header");
+      if (stillExistsById || stillExistsByClass) {
+        this.removeCategoriesHeader();
+        this.isInserting = true;
+      }
       
       const headerHtml = this.buildCategoriesHeader(categoriesData);
-      console.log('[DEBUG] Header HTML built, length:', headerHtml.length);
+      const headerElement = document.createElement("div");
+      headerElement.innerHTML = headerHtml;
+      headerElement.className = "dynamic-categories-header";
+      headerElement.id = "dynamic-categories-header-unique";
       
-             const headerElement = document.createElement("div");
-       headerElement.innerHTML = headerHtml;
-       headerElement.className = "dynamic-categories-header";
-       headerElement.id = "dynamic-categories-header-unique";
-       
-       console.log('[DEBUG] Header element created, inserting...');
-       if (targetElement && targetElement.parentNode) {
-         targetElement.insertAdjacentElement("beforebegin", headerElement);
-         console.log('[DEBUG] Header element inserted successfully');
-         
-         // 验证插入是否成功
-         const inserted = document.getElementById("dynamic-categories-header-unique");
-         console.log('[DEBUG] Verification - element exists after insertion:', inserted !== null);
-       } else {
-         console.log('[DEBUG] Cannot insert - no target element or parent');
-       }
+      if (targetElement && targetElement.parentNode) {
+        targetElement.insertAdjacentElement("beforebegin", headerElement);
+      }
       
     } catch (error) {
       console.error("Failed to load categories:", error);
@@ -117,48 +89,33 @@ export default {
   },
   
   findInsertionPoint() {
-    console.log('[DEBUG] Finding insertion point with universal strategy...');
-    
-    // 使用通用策略：寻找主内容区域，适用于所有用户状态
-    
-    // 1. 寻找包含实际内容的container，跳过banner
     const containers = document.querySelectorAll("#main-outlet > .container");
-    console.log('[DEBUG] Found containers:', containers.length);
     
     for (let i = 0; i < containers.length; i++) {
       const container = containers[i];
-      console.log(`[DEBUG] Container ${i}:`, container.className);
       
-      // 跳过banner和搜索相关的容器
       if (!container.classList.contains('search-banner') && 
           !container.classList.contains('welcome-banner') &&
           !container.className.includes('above-main-container-outlet')) {
-        console.log('[DEBUG] Selected main content container:', container.className);
         return container;
       }
     }
     
-    // 2. 如果没找到合适的container，寻找第一个非banner元素
     const mainOutlet = document.querySelector("#main-outlet");
     if (mainOutlet) {
       const children = Array.from(mainOutlet.children);
-      console.log('[DEBUG] main-outlet children:', children.length);
       
       for (let i = 0; i < children.length; i++) {
         const child = children[i];
-        console.log(`[DEBUG] Child ${i}:`, child.className);
         
-        // 跳过各种banner
         if (!child.classList.contains('above-main-container-outlet') && 
             !child.classList.contains('welcome-banner') &&
             !child.classList.contains('search-banner')) {
-          console.log('[DEBUG] Selected first content element:', child.className);
           return child;
         }
       }
     }
     
-    console.log('[DEBUG] No suitable insertion point found');
     return null;
   },
   
