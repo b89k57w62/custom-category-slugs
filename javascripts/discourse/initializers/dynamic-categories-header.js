@@ -98,10 +98,16 @@ export default {
       return adBanner;
     }
     
-    // 處理登录用戶的DOM結構
+    // 處理登录用戶的DOM結構  
     const listControls = document.querySelector(".list-controls");
     if (listControls) {
       return listControls;
+    }
+    
+    // 查找 list-container（登录用户特有）
+    const listContainer = document.querySelector(".list-container");
+    if (listContainer) {
+      return listContainer;
     }
     
     const navigationContainer = document.querySelector(".navigation-container");
