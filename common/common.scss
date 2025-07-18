@@ -405,20 +405,41 @@
   }
 }
 
-.dynamic-categories-header a.category-nav-item {
-  color: var(--primary);
-  text-decoration: none;
-  
-  &:link,
-  &:visited {
+@media (min-width: 1025px) {
+  .dynamic-categories-header a.category-nav-item {
     color: var(--primary);
     text-decoration: none;
+    
+    &:link,
+    &:visited {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    &:hover,
+    &:focus {
+      color: var(--primary);
+      text-decoration: none;
+    }
   }
-  
-  &:hover,
-  &:focus {
-    color: var(--primary);
+}
+
+@media (max-width: 1024px) {
+  .dynamic-categories-header a.category-nav-item {
+    color: #ffffff !important;
     text-decoration: none;
+    
+    &:link,
+    &:visited {
+      color: #ffffff !important;
+      text-decoration: none;
+    }
+    
+    &:hover,
+    &:focus {
+      color: #ffffff !important;
+      text-decoration: none;
+    }
   }
 }
 
